@@ -1,0 +1,27 @@
+# Get Iter8
+FROM golang:1.18-buster as builder
+
+RUN mkdir -p /Users/kalantar@us.ibm.com/projects/go.workspace/src/github.com/iter8-tools
+WORKDIR /Users/kalantar@us.ibm.com/projects/go.workspace/src/github.com/iter8-tools
+RUN git clone https://github.com/kalantar/iter8.git
+RUN cd iter8 && git checkout abn
+
+WORKDIR /
+COPY frontend/ frontend/
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go mod download
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o fe frontend/main.go
+
+### Multi-stage Docker build
+### New image below
+
+# Small linux image with iter8 binary
+FROM debian:buster-slim
+WORKDIR /
+COPY --from=builder /fe /frontend
+
+RUN apt-get update && apt-get install -y curl
+
+ENTRYPOINT ["/frontend"]
