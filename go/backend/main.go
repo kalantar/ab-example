@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	VERSION         = "version"
+	VERSION         = "VERSION"
 	DEFAULT_VERSION = "v1"
 )
 
@@ -19,12 +19,13 @@ func getVersion() string {
 	return version
 }
 
-func version(w http.ResponseWriter, req *http.Request) {
-	//w.Header()Set("Content-Type", "application/json")
+// implment /world endpoint returning value of VERSION env variable
+func world(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(w, getVersion())
 }
 
 func main() {
-	http.HandleFunc("/version", version)
+	// configure backend service with "/world" endpoint
+	http.HandleFunc("/world", world)
 	http.ListenAndServe(":8090", nil)
 }

@@ -1,90 +1,107 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
-	"github.com/iter8-tools/iter8/abn/util"
-	"github.com/iter8-tools/iter8/base/log"
-	iter8abn "github.com/kalantar/ab-example/go/frontend/iter8"
-)
-
-const (
-	// Default endpoint for ABn service
-	ABN_SERVICE_ENDPOINT = "abn:50051"
-
-	// Name of a backend service
-	BACKEND_SERVICE = "backend"
-	// Namespace where bacekend service deployed
-	BACKEND_NAMESPACE = "default"
-	// Default track to assign if ABn service can not find one
-	DEFAULT_TRACK = "current"
-
-	// Name of a sample metric
-	SAMPLE_METRIC = "sample_metric"
+	pb "github.com/iter8-tools/iter8/abn/grpc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
 	// ABn service; assigned by init() method
-	abnService iter8abn.DefaultABnService
+	abnService *pb.ABNClient
 )
 
-// Assumes user is specified in a header X-User.
-// If not set, a random user name will be assigned.
-func user(req *http.Request) string {
+// implment /hello endpoint
+// calls backend service /version endpoint
+func hello(w http.ResponseWriter, req *http.Request) {
+	// Get user (session) identifier, for example by inspection of header X-User
 	users, ok := req.Header["X-User"]
 	if !ok {
-		users = []string{util.RandomString(16)}
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "header X-User missing")
+		return
 	}
-	return users[0]
-}
+	user := users[0]
 
-// getBackendURL returns a URL to the backend service to be used to satisffy a request for user
-func getBackendURL(user string) string {
-	// return "http://" + BACKEND_SERVICE + "-" + getTrack(user) + ":8090"
-	return "http://" +
-		BACKEND_SERVICE +
-		"-" +
-		abnService.GetTrack(user) +
-		":8090"
-}
+	// Get endpoint of backend endpoint "/world"
+	// In this example, the backend endpoint depends on the version (track) of the backend service
+	// the user is assigned by the Iter8 SDK Lookup() method
 
-// GET version of backend service
-func version(w http.ResponseWriter, req *http.Request) {
-	user := user(req)
-	backendURL := getBackendURL(user)
-	log.Logger.Infof("for user '%s', backendURL = %s", user, backendURL)
+	// verify the ABn service is avaiable
+	if abnService == nil {
+		http.Error(w, "ABn service unavailable", http.StatusInternalServerError)
+		return
+	}
 
-	resp, err := http.Get(backendURL + "/version")
+	// call ABn service API Lookup() to get an assigned track for the user
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	s, err := (*abnService).Lookup(
+		ctx,
+		&pb.Application{
+			Name: "default/backend",
+			User: user,
+		},
+	)
+	cancel()
 	if err != nil {
-		log.Logger.Info("GET /version failed: ", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("ABn service Lookup() failed %s", err), http.StatusInternalServerError)
+		return
+	}
+
+	// construct URL
+	url := "http://backend-" + s.Track + ":8090/world"
+
+	// call backend service using url
+	resp, err := http.Get(url)
+	if err != nil {
+		http.Error(w, "call to backend endpoint /world failed", http.StatusInternalServerError)
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Logger.Info("GET /version no data: ", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("backend endpoint /world returned no data %s", err), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintln(w, string(body))
 
-	abnService.WriteMetric(SAMPLE_METRIC, strconv.Itoa(rand.Intn(100)), user)
+	// write response to query
+	fmt.Fprintln(w, "Hello world "+string(body))
+
+	// export metric to metrics database
+	// this is best effort; we ignore any failure
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	_, _ = (*abnService).WriteMetric(
+		ctx,
+		&pb.MetricValue{
+			Name:        "sample_metric",
+			Value:       strconv.Itoa(rand.Intn(100)),
+			Application: "default/backend",
+			User:        user,
+		},
+	)
+	cancel()
 }
 
 func main() {
-	http.HandleFunc("/version", version)
-	http.ListenAndServe(":8091", nil)
-}
-
-func init() {
-	abnService = iter8abn.DefaultABnService{
-		AppName:      BACKEND_NAMESPACE + "/" + BACKEND_SERVICE,
-		DefaultTrack: DEFAULT_TRACK,
-		Service:      iter8abn.NewClient(ABN_SERVICE_ENDPOINT),
+	// establish connect to ABn service
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	conn, err := grpc.Dial("abn:50051", opts...)
+	if err != nil {
+		fmt.Printf("unable to connect to ABn service: %s\n", err.Error())
+		return
 	}
 
+	client := pb.NewABNClient(conn)
+	abnService = &client
+
+	// configure frontend service with "/hello" endpoint
+	http.HandleFunc("/hello", hello)
+	http.ListenAndServe(":8091", nil)
 }

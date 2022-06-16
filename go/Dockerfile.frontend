@@ -22,6 +22,4 @@ FROM debian:buster-slim
 WORKDIR /
 COPY --from=builder /fe /frontend
 
-RUN apt-get update && apt-get install -y curl
-
 ENTRYPOINT ["/frontend"]
