@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	pb "github.com/iter8-tools/iter8/abn/grpc"
+	pb "github.com/kalantar/ab-example/frontend/go/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

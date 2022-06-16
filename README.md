@@ -14,34 +14,53 @@ An Iter8 experiment can then be written to evaluate the versions.
 
 Sample implementations of the frontend service in go, ... demonstrate the use of the Iter8 API. In these samples, all errors are reported as failures. In practice, a default track might be used.
 
-## Go
+## Backend Service
+
+Build:
+
+```shell
+docker build . -f backend/Dockerfile.backend -t $BACKEND_TAG
+docker push $BACKEND_TAG
+```
+
+Deploy:
+
+```shell
+sed -e "s#BACKEND_TAG#$BACKEND_TAG#" backend/deploy.yaml | kubectl apply -f -
+```
+
+## Frontend Service
+
+Sample implementations are available in:
+
+- [go](#go)
+
+### Implementation in go
 
 ```shell
 cd go
 ```
 
-### Build
+#### Build
 
-Set `FRONTEND_TAG` and `BACKEND_TAG` to names of target docker images and build:
+Set `FRONTEND_TAG` to the name of a docker image. Then build:
 
 ```shell
-docker build . -f Dockerfile.frontend -t $FRONTEND_TAG
+docker build . -f frontend/go/Dockerfile.frontend -t $FRONTEND_TAG
 docker push $FRONTEND_TAG
-docker build . -f Dockerfile.backend -t $BACKEND_TAG
-docker push $BACKEND_TAG
 ```
 
-### Deploy
+#### Deploy
 
 Deploy the application:
 
 ```shell
-sed -e "s#FRONTEND_TAG#$FRONTEND_TAG#" -e "s#BACKEND_TAG#$BACKEND_TAG#" deploy.yaml | kubectl apply -f -
+sed -e "s#FRONTEND_TAG#$FRONTEND_TAG#" frontend/deploy.yaml | kubectl apply -f -
 ```
 
-### Test
+## Test
 
-Forward the frontend service:
+Port forward the frontend service:
 
 ```shell
 kubectl port-forward deploy/frontend 8091:8091
