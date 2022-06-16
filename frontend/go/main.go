@@ -16,7 +16,11 @@ import (
 
 var (
 	// ABn service; assigned by init() method
-	abnService *pb.ABNClient
+	abnService   *pb.ABNClient
+	trackToRoute = map[string]string{
+		"current":   "http://backend-current:8090",
+		"candidate": "http://backend-candidate:8090",
+	}
 )
 
 // implment /hello endpoint
@@ -56,11 +60,15 @@ func hello(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// construct URL
-	url := "http://backend-" + s.Track + ":8090/world"
+	// lookup route using track
+	route, ok := trackToRoute[s.GetTrack()]
+	if !ok {
+		http.Error(w, fmt.Sprintf("unknown track returned: %s", s.GetTrack()), http.StatusInternalServerError)
+		return
+	}
 
 	// call backend service using url
-	resp, err := http.Get(url)
+	resp, err := http.Get(route + "/world")
 	if err != nil {
 		http.Error(w, "call to backend endpoint /world failed", http.StatusInternalServerError)
 		return
