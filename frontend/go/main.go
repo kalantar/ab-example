@@ -38,7 +38,7 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
-	// establish connect to ABn service
+	// establish connection to ABn service
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial("abn:50051", opts...)
 	if err != nil {
@@ -100,7 +100,7 @@ func goodbye(w http.ResponseWriter, req *http.Request) {
 	// export metric to metrics database
 	// this is best effort; we ignore any failure
 
-	// establish connect to ABn service
+	// establish connection to ABn service
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial("abn:50051", opts...)
 	if err != nil {
