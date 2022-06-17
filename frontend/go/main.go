@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	// ABn service; assigned by init() method
-	abnService   *pb.ABNClient
+	// map of track to route to backend service
 	trackToRoute = map[string]string{
 		"current":   "http://backend-current:8090",
 		"candidate": "http://backend-candidate:8090",
@@ -24,7 +23,7 @@ var (
 )
 
 // implment /hello endpoint
-// calls backend service /version endpoint
+// calls backend service /world endpoint
 func hello(w http.ResponseWriter, req *http.Request) {
 	// Get user (session) identifier, for example by inspection of header X-User
 	users, ok := req.Header["X-User"]
@@ -39,22 +38,25 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
-	// verify the ABn service is avaiable
-	if abnService == nil {
-		http.Error(w, "ABn service unavailable", http.StatusInternalServerError)
+	// establish connect to ABn service
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	conn, err := grpc.Dial("abn:50051", opts...)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error connecting to ABn service: %s", err), http.StatusInternalServerError)
 		return
 	}
+	client := pb.NewABNClient(conn)
 
 	// call ABn service API Lookup() to get an assigned track for the user
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	s, err := (*abnService).Lookup(
+	defer cancel()
+	s, err := client.Lookup(
 		ctx,
 		&pb.Application{
 			Name: "default/backend",
 			User: user,
 		},
 	)
-	cancel()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("ABn service Lookup() failed %s", err), http.StatusInternalServerError)
 		return
@@ -81,11 +83,36 @@ func hello(w http.ResponseWriter, req *http.Request) {
 
 	// write response to query
 	fmt.Fprintln(w, "Hello world "+string(body))
+}
+
+// implment /goodbye endpoint
+// writes value for sample_metric which may have spanned several calls to /hello
+func goodbye(w http.ResponseWriter, req *http.Request) {
+	// Get user (session) identifier, for example by inspection of header X-User
+	users, ok := req.Header["X-User"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "header X-User missing")
+		return
+	}
+	user := users[0]
 
 	// export metric to metrics database
 	// this is best effort; we ignore any failure
-	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	_, _ = (*abnService).WriteMetric(
+
+	// establish connect to ABn service
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	conn, err := grpc.Dial("abn:50051", opts...)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error connecting to ABn service: %s", err), http.StatusInternalServerError)
+		return
+	}
+	client := pb.NewABNClient(conn)
+
+	// export metric
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	_, _ = client.WriteMetric(
 		ctx,
 		&pb.MetricValue{
 			Name:        "sample_metric",
@@ -94,22 +121,11 @@ func hello(w http.ResponseWriter, req *http.Request) {
 			User:        user,
 		},
 	)
-	cancel()
 }
 
 func main() {
-	// establish connect to ABn service
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	conn, err := grpc.Dial("abn:50051", opts...)
-	if err != nil {
-		fmt.Printf("unable to connect to ABn service: %s\n", err.Error())
-		return
-	}
-
-	client := pb.NewABNClient(conn)
-	abnService = &client
-
-	// configure frontend service with "/hello" endpoint
+	// configure frontend service with "/hello" and "/goodbye" endpoints
 	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/goodbye", goodbye)
 	http.ListenAndServe(":8091", nil)
 }

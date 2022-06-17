@@ -31,34 +31,31 @@ sed -e "s#BACKEND_TAG#$BACKEND_TAG#" backend/deploy.yaml | kubectl apply -f -
 
 ## Frontend Service
 
-Sample implementations are available in:
+Sample implementations are provided in:
 
-- [go](#go)
+- [go](https://github.com/kalantar/ab-example/tree/main/frontend/go)
+- [python](https://github.com/kalantar/ab-example/tree/main/frontend/python)
 
-### Implementation in go
+### Build
 
-```shell
-cd go
-```
-
-#### Build
+Set `FRONTEND_LANG` to implementation language, one of `go` or `python`.
 
 Set `FRONTEND_TAG` to the name of a docker image. Then build:
 
 ```shell
-docker build . -f frontend/go/Dockerfile.frontend -t $FRONTEND_TAG
+docker build . -f frontend/$FRONTEND_LANG/Dockerfile.frontend -t $FRONTEND_TAG
 docker push $FRONTEND_TAG
 ```
 
-#### Deploy
+### Deploy
 
-Deploy the application:
+Deploy the frontend service:
 
 ```shell
 sed -e "s#FRONTEND_TAG#$FRONTEND_TAG#" frontend/deploy.yaml | kubectl apply -f -
 ```
 
-## Test
+### Test
 
 Port forward the frontend service:
 
@@ -66,7 +63,7 @@ Port forward the frontend service:
 kubectl port-forward deploy/frontend 8091:8091
 ```
 
-Call the application. For example:
+Call, for example:
 
 ```shell
 curl localhost:8091/hello -H 'X-User: foo'
