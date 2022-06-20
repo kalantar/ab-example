@@ -17,24 +17,18 @@ import (
 var (
 	// map of track to route to backend service
 	trackToRoute = map[string]string{
-		"current":   "http://backend-current:8090",
-		"candidate": "http://backend-candidate:8090",
+		"current":   "http://backend-current:8091",
+		"candidate": "http://backend-candidate:8091",
 	}
 )
 
-// implment /hello endpoint
-// calls backend service /world endpoint
-func hello(w http.ResponseWriter, req *http.Request) {
+// implment /getRecommendation endpoint
+// calls backend service /recommend endpoint
+func getRecommendation(w http.ResponseWriter, req *http.Request) {
 	// Get user (session) identifier, for example by inspection of header X-User
-	users, ok := req.Header["X-User"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "header X-User missing")
-		return
-	}
-	user := users[0]
+	user := req.Header["X-User"][0]
 
-	// Get endpoint of backend endpoint "/world"
+	// Get endpoint of backend endpoint "/recommend"
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
@@ -63,39 +57,29 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// lookup route using track
-	route, ok := trackToRoute[s.GetTrack()]
-	if !ok {
-		http.Error(w, fmt.Sprintf("unknown track returned: %s", s.GetTrack()), http.StatusInternalServerError)
-		return
-	}
+	route := trackToRoute[s.GetTrack()]
 
 	// call backend service using url
-	resp, err := http.Get(route + "/world")
+	resp, err := http.Get(route + "/recommend")
 	if err != nil {
-		http.Error(w, "call to backend endpoint /world failed", http.StatusInternalServerError)
+		http.Error(w, "call to backend endpoint /recommend failed", http.StatusInternalServerError)
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("backend endpoint /world returned no data %s", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("backend endpoint /recommend returned no data %s", err), http.StatusInternalServerError)
 		return
 	}
 
 	// write response to query
-	fmt.Fprintln(w, "Hello world "+string(body))
+	fmt.Fprintln(w, "Recommendation: "+string(body))
 }
 
-// implment /goodbye endpoint
-// writes value for sample_metric which may have spanned several calls to /hello
-func goodbye(w http.ResponseWriter, req *http.Request) {
+// implment /buy endpoint
+// writes value for sample_metric which may have spanned several calls to /getRecommendatoon
+func buy(w http.ResponseWriter, req *http.Request) {
 	// Get user (session) identifier, for example by inspection of header X-User
-	users, ok := req.Header["X-User"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "header X-User missing")
-		return
-	}
-	user := users[0]
+	user := req.Header["X-User"][0]
 
 	// export metric to metrics database
 	// this is best effort; we ignore any failure
@@ -125,7 +109,7 @@ func goodbye(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	// configure frontend service with "/hello" and "/goodbye" endpoints
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/goodbye", goodbye)
-	http.ListenAndServe(":8091", nil)
+	http.HandleFunc("/getRecommendation", getRecommendation)
+	http.HandleFunc("/buy", buy)
+	http.ListenAndServe(":8090", nil)
 }

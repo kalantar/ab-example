@@ -37,7 +37,7 @@ spec:
     app.kubernetes.io/name: backend
     app.kubernetes.io/version: v1
   ports:
-  - port: 8090
+  - port: 8091
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -78,4 +78,4 @@ spec:
     app.kubernetes.io/name: backend
     app.kubernetes.io/version: v2
   ports:
-  - port: 8090
+  - port: 8091

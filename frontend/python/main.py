@@ -11,22 +11,20 @@ from flask import Flask, request
 
 # map of track to route to backend service
 trackToRoute = {
-    "current": "http://backend-current:8090",
-	"candidate": "http://backend-candidate:8090"
+    "current": "http://backend-current:8091",
+	"candidate": "http://backend-candidate:8091"
 }
 
 app = Flask(__name__)
 
-# implement /hello endpoint
-# calls backend service /world endpoint
-@app.route('/hello')
-def hello():
+# implement /getRecommendation endpoint
+# calls backend service /recommend endpoint
+@app.route('/getRecommendation')
+def getRecommendation():
     # Get user (session) identifier, for example, by inspection of header X-User
-    if not ('X-User' in request.headers):
-        return "header X-User missing", HTTPStatus.INTERNAL_SERVER_ERROR
     user = request.headers['X-User']
 
-    # Get endpoint of backend endpoint "/world"
+    # Get endpoint of backend endpoint "/recommend"
     # In this example, the backend endpoint depends on the version (track) of the backend service
     # the user is assigned by the Iter8 SDK Lookup() method
 
@@ -41,27 +39,23 @@ def hello():
         )
 
         # lookkup route using track
-        if not (s.track in trackToRoute):
-            return "unknwon track returned: {0}".format(s.track), HTTPStatus.INTERNAL_SERVER_ERROR
         route = trackToRoute[s.track]
 
         # call backend service using url
         try:
-            r = requests.get(url=route + "/world", allow_redirects=True)
+            r = requests.get(url=route + "/recommend", allow_redirects=True)
             r.raise_for_status()
-            world = r.text
+            recommendation = r.text
         except Exception as e:
-            return "call to backend endpoint /world failed: {0}".format(e), HTTPStatus.INTERNAL_SERVER_ERROR
+            return "call to backend endpoint /recommend failed: {0}".format(e), HTTPStatus.INTERNAL_SERVER_ERROR
 
-        return "hello world {0}".format(world)
+        return "Recommendation: {0}".format(recommendation)
     
-# implement /goodbye endpoint
-# writes value for sample_metrc which may have spanned several calls to /hello
-@app.route('/goodbye')
-def goodbye():
+# implement /buy endpoint
+# writes value for sample_metrc which may have spanned several calls to /getRecommendation
+@app.route('/buy')
+def buy():
     # Get user (session) identifier, for example, by inspection of header X-User
-    if not ('X-User' in request.headers):
-        return "header X-User missing", HTTPStatus.INTERNAL_SERVER_ERROR
     user = request.headers['X-User']
 
 	# export metric to metrics database

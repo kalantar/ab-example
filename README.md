@@ -19,7 +19,7 @@ Sample implementations of the frontend service in go, ... demonstrate the use of
 Build:
 
 ```shell
-docker build . -f backend/Dockerfile.backend -t $BACKEND_TAG
+docker build . -f backend/Dockerfile -t $BACKEND_TAG
 docker push $BACKEND_TAG
 ```
 
@@ -35,6 +35,7 @@ Sample implementations are provided in:
 
 - [go](https://github.com/kalantar/ab-example/tree/main/frontend/go)
 - [python](https://github.com/kalantar/ab-example/tree/main/frontend/python)
+- [node](https://github.com/kalantar/ab-example/tree/main/frontend/node)
 
 ### Build
 
@@ -43,7 +44,7 @@ Set `FRONTEND_LANG` to implementation language, one of `go`, `python` or `node`.
 Set `FRONTEND_TAG` to the name of a docker image. Then build:
 
 ```shell
-docker build . -f frontend/$FRONTEND_LANG/Dockerfile.frontend -t $FRONTEND_TAG
+docker build . -f frontend/$FRONTEND_LANG/Dockerfile -t $FRONTEND_TAG
 docker push $FRONTEND_TAG
 ```
 
@@ -60,11 +61,16 @@ sed -e "s#FRONTEND_TAG#$FRONTEND_TAG#" frontend/deploy.yaml | kubectl apply -f -
 Port forward the frontend service:
 
 ```shell
-kubectl port-forward deploy/frontend 8091:8091
+kubectl port-forward deploy/frontend 8090:8090
 ```
 
-Call, for example:
+Call (perhaps several times):
 
 ```shell
-curl localhost:8091/hello -H 'X-User: foo'
+curl localhost:8090/getRecommendation -H 'X-User: foo'
 ```
+
+and then:
+
+```shell
+curl localhhost:8090/buy -H 'X-User: foo'
