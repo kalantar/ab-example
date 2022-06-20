@@ -38,7 +38,7 @@ Sample implementations are provided in:
 
 ### Build
 
-Set `FRONTEND_LANG` to implementation language, one of `go` or `python`.
+Set `FRONTEND_LANG` to implementation language, one of `go`, `python` or `node`.
 
 Set `FRONTEND_TAG` to the name of a docker image. Then build:
 
