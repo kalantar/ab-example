@@ -14,6 +14,10 @@ An Iter8 experiment can then be written to evaluate the versions.
 
 Sample implementations of the frontend service in go, ... demonstrate the use of the Iter8 API. In these samples, all errors are reported as failures. In practice, a default track might be used.
 
+## Prerequisite
+
+Kubernetes cluster with ABn service deployed.  See ...
+
 ## Backend Service
 
 Build:

@@ -17,9 +17,12 @@ import (
 var (
 	// map of track to route to backend service
 	trackToRoute = map[string]string{
-		"current":   "http://backend-current:8091",
+		"default":   "http://backend:8091",
 		"candidate": "http://backend-candidate:8091",
 	}
+
+	// gRPC client connection
+	client *pb.ABNClient // set in main()
 )
 
 // implment /getRecommendation endpoint
@@ -32,32 +35,26 @@ func getRecommendation(w http.ResponseWriter, req *http.Request) {
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
-	// establish connection to ABn service
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	conn, err := grpc.Dial("abn:50051", opts...)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("error connecting to ABn service: %s", err), http.StatusInternalServerError)
-		return
-	}
-	client := pb.NewABNClient(conn)
+	// start with default route
+	route := trackToRoute["default"]
 
 	// call ABn service API Lookup() to get an assigned track for the user
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	s, err := client.Lookup(
+	s, err := (*client).Lookup(
 		ctx,
 		&pb.Application{
 			Name: "default/backend",
 			User: user,
 		},
 	)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("ABn service Lookup() failed %s", err), http.StatusInternalServerError)
-		return
+	// if successful, use recommended track; otherwise will use default route
+	if err == nil && s != nil {
+		r, ok := trackToRoute[s.GetTrack()]
+		if ok {
+			route = r
+		}
 	}
-
-	// lookup route using track
-	route := trackToRoute[s.GetTrack()]
 
 	// call backend service using url
 	resp, err := http.Get(route + "/recommend")
@@ -81,22 +78,10 @@ func buy(w http.ResponseWriter, req *http.Request) {
 	// Get user (session) identifier, for example by inspection of header X-User
 	user := req.Header["X-User"][0]
 
-	// export metric to metrics database
-	// this is best effort; we ignore any failure
-
-	// establish connection to ABn service
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	conn, err := grpc.Dial("abn:50051", opts...)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("error connecting to ABn service: %s", err), http.StatusInternalServerError)
-		return
-	}
-	client := pb.NewABNClient(conn)
-
-	// export metric
+	// export metric to metrics database; this is best effort; ignore any failure
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_, _ = client.WriteMetric(
+	_, _ = (*client).WriteMetric(
 		ctx,
 		&pb.MetricValue{
 			Name:        "sample_metric",
@@ -108,6 +93,16 @@ func buy(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	// establish connection to ABn service
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	conn, err := grpc.Dial("abn:50051", opts...)
+	if err != nil {
+		panic("Cannot establish connection with abn service")
+		return
+	}
+	c := pb.NewABNClient(conn)
+	client = &c
+
 	// configure frontend service with "/hello" and "/goodbye" endpoints
 	http.HandleFunc("/getRecommendation", getRecommendation)
 	http.HandleFunc("/buy", buy)

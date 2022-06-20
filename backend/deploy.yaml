@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/version: v1
   annotations:
     iter8.tools/ready: "true"
-    iter8.tools/track: current
+    iter8.tools/track: default
 spec:
   replicas: 1
   selector:
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-current
+  name: backend
 spec:
   selector:
     app.kubernetes.io/name: backend

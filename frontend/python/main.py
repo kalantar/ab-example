@@ -11,7 +11,7 @@ from flask import Flask, request
 
 # map of track to route to backend service
 trackToRoute = {
-    "current": "http://backend-current:8091",
+    "default": "http://backend:8091",
 	"candidate": "http://backend-candidate:8091"
 }
 
@@ -28,28 +28,35 @@ def getRecommendation():
     # In this example, the backend endpoint depends on the version (track) of the backend service
     # the user is assigned by the Iter8 SDK Lookup() method
 
+    # start with default route
+    route = trackToRoute["default"]
+
     # establish connection to ABn service
     with grpc.insecure_channel("abn:50051") as channel:
         stub = abn_pb2_grpc.ABNStub(channel)
 
-        # call ABn service API Lookup() to get an assigned track for the user
-        s = stub.Lookup( \
-            abn_pb2.Application(name="default/backend", \
-            user=user) \
-        )
-
-        # lookkup route using track
-        route = trackToRoute[s.track]
-
-        # call backend service using url
         try:
-            r = requests.get(url=route + "/recommend", allow_redirects=True)
-            r.raise_for_status()
-            recommendation = r.text
-        except Exception as e:
-            return "call to backend endpoint /recommend failed: {0}".format(e), HTTPStatus.INTERNAL_SERVER_ERROR
+            # call ABn service API Lookup() to get an assigned track for the user
+            s = stub.Lookup( \
+                abn_pb2.Application(name="default/backend", \
+                user=user) \
+            )
 
-        return "Recommendation: {0}".format(recommendation)
+            # lookup route using track
+            route = trackToRoute[s.track]
+        except Exception as e:
+            # use default
+            pass
+
+    # call backend service using url
+    try:
+        r = requests.get(url=route + "/recommend", allow_redirects=True)
+        r.raise_for_status()
+        recommendation = r.text
+    except Exception as e:
+        return "call to backend endpoint /recommend failed: {0}".format(e), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    return "Recommendation: {0}".format(recommendation)
     
 # implement /buy endpoint
 # writes value for sample_metrc which may have spanned several calls to /getRecommendation
@@ -67,11 +74,14 @@ def buy():
 
         # export metric to metrics database
         # this is best effort; we ignore any failure
-        stub.WriteMetric( \
-            abn_pb2.MetricValue(name="sample_metric", \
-            value=str(random.randint(0,100)), \
-            application="default/backend", \
-            user=user) \
-        )
+        try:
+            stub.WriteMetric( \
+                abn_pb2.MetricValue(name="sample_metric", \
+                value=str(random.randint(0,100)), \
+                application="default/backend", \
+                user=user) \
+            )
+        except Exception as e:
+            pass
 
     return ""

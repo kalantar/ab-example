@@ -12,9 +12,11 @@ const app  = express();
 
 // map of track to route to backend service
 const trackToRoute = {
-    "current":   "http://backend-current:8091",
+    "default":   "http://backend:8091",
     "candidate": "http://backend-candidate:8091",
 }
+// establish connection to ABn service
+var client = new services.ABNClient('abn:50051', grpc.credentials.createInsecure());
 
 // implement /getRecommendation endpoint
 // calls backend service /recommend endpoint
@@ -26,8 +28,8 @@ app.get('/getRecommendation', (req, res) => {
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
-    // establish connection to ABn service
-    var client = new services.ABNClient('abn:50051', grpc.credentials.createInsecure());
+    // start with default route
+    route = trackToRoute['default']
 
     // call ABn service API Lookup() to get an assigned track for the user
     var application = new messages.Application();
@@ -35,21 +37,21 @@ app.get('/getRecommendation', (req, res) => {
     application.setUser(user);
     client.lookup(application, function(err, session) {
         // lookup route using track
-        var route = trackToRoute[session.getTrack()];
+        route = trackToRoute[session.getTrack()];
+    });
  
-        // call backend service using url
-        http.get(route + '/recommend', (resp) => {
-            let str = '';
-            resp.on('data', function(chunk) {
-                str += chunk;
-            });
-            resp.on('end', function () {
-                // write response to query
-                res.send(`Recommendation: ${str}`);
-            });
-        }).on("error", (err) => {
-            console.log("Error: " + err.message)
+    // call backend service using route
+    http.get(route + '/recommend', (resp) => {
+        let str = '';
+        resp.on('data', function(chunk) {
+            str += chunk;
         });
+        resp.on('end', function () {
+            // write response to query
+            res.send(`Recommendation: ${str}`);
+        });
+    }).on("error", (err) => {
+        res.status(500).send(err.message);
     });
 });
 
@@ -61,9 +63,6 @@ app.get('/buy', (req, res) => {
 
 	// export metric to metrics database
 	// this is best effort; we ignore any failure
-
-	// establish connection to ABn service
-    var client = new services.ABNClient('abn:50051', grpc.credentials.createInsecure());
 
     // export metric
     var mv = new messages.MetricValue();
