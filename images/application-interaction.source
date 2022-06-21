@@ -1,8 +1,0 @@
-title: Simple application
-
-user ->> frontend: /hello
-
-frontend ->> backend: /world
-backend ->> frontend: _version_
-
-frontend ->> user: hello world _version_

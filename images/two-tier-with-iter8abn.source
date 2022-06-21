@@ -1,0 +1,15 @@
+title: Two-tier application
+
+group: Several recommendations might be requestesd before a buy. 
+user ->> frontend: /getRecommendation
+
+frontend ->> backend: /recommend
+backend ->> frontend: _recommendation_
+
+frontend ->> user: _Recommendation: recommendation_
+end
+
+...:
+
+user ->> frontend: /buy
+frontend ->> user:

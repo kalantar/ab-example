@@ -1,0 +1,19 @@
+title: Two-tier application with Iter8 ABn service
+
+group: Several recommendations might be requestesd before a buy. 
+user ->> frontend: /getRecommendation
+
+frontend -->> ABn Service: Lookup()
+ABn Service -->> frontend: track
+
+frontend ->> backend-track: /recommend
+backend-track ->> frontend: _recommendation_
+
+frontend ->> user: _Recommendation: recommendation_
+end
+
+...:
+
+user ->> frontend: /buy
+frontend -->> ABn Service: WriteMetric()
+frontend ->> user:
