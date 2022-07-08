@@ -2,6 +2,7 @@ var messages = require('./abn_pb.js');
 var services = require('./abn_grpc_pb.js');
 var grpc = require('@grpc/grpc-js');
 var http = require('http');
+var random = require('random-number');
 
 'use strict';
 const express = require('express');
@@ -67,7 +68,7 @@ app.get('/buy', (req, res) => {
     // export metric
     var mv = new messages.MetricValue();
     mv.setName('sample_metric');
-    mv.setValue(); 
+    mv.setValue(random({min: 0, max: 100, integer: true}).toString()); 
     mv.setApplication('default/backend');
     mv.setUser(user);
     client.writeMetric(mv, function(err, session) {});

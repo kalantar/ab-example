@@ -98,7 +98,7 @@ func main() {
 	conn, err := grpc.Dial("abn:50051", opts...)
 	if err != nil {
 		panic("Cannot establish connection with abn service")
-		return
+		// return
 	}
 	c := pb.NewABNClient(conn)
 	client = &c
