@@ -4,15 +4,19 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	pb "github.com/kalantar/ab-example/frontend/go/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+// var log *logrus.Logger
 
 var (
 	// map of track to route to backend service
@@ -23,11 +27,15 @@ var (
 
 	// gRPC client connection
 	client *pb.ABNClient // set in main()
+	Logger = logrus.New()
 )
 
 // implment /getRecommendation endpoint
 // calls backend service /recommend endpoint
 func getRecommendation(w http.ResponseWriter, req *http.Request) {
+	Logger.Info("/getRecommendation")
+	defer Logger.Info("returned ")
+
 	// Get user (session) identifier, for example by inspection of header X-User
 	user := req.Header["X-User"][0]
 
@@ -75,6 +83,8 @@ func getRecommendation(w http.ResponseWriter, req *http.Request) {
 // implment /buy endpoint
 // writes value for sample_metric which may have spanned several calls to /getRecommendatoon
 func buy(w http.ResponseWriter, req *http.Request) {
+	Logger.Info("/buy")
+	defer Logger.Info("returned ", http.StatusAccepted)
 	// Get user (session) identifier, for example by inspection of header X-User
 	user := req.Header["X-User"][0]
 
@@ -85,14 +95,35 @@ func buy(w http.ResponseWriter, req *http.Request) {
 		ctx,
 		&pb.MetricValue{
 			Name:        "sample_metric",
-			Value:       strconv.Itoa(rand.Intn(100)),
+			Value:       fmt.Sprintf("%f", rand.Float64()*100.0), // strconv.Itoa(rand.Intn(100)),
 			Application: "default/backend",
 			User:        user,
 		},
 	)
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func main() {
+	Logger.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+		FullTimestamp:   true,
+		DisableQuote:    true,
+		DisableSorting:  true,
+	})
+	Logger.SetLevel(logrus.TraceLevel)
+
+	t := time.Now()
+	fmt.Println(t)
+	eu := t.Unix()
+	fmt.Println(eu)
+	ef := float64(eu)
+	fmt.Println(ef)
+	// time.Unix(int64(math.Round(encoded[5])), 0)
+	di := int64(math.Round(ef))
+	fmt.Println(di)
+	dt := time.Unix(di, 0)
+	fmt.Println(dt)
+
 	// establish connection to ABn service
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial("abn:50051", opts...)

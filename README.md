@@ -15,7 +15,7 @@ To address the challenge of associating a business metric computed by a frontend
 
 This project contains a sample two-tier application that demonstrates the use of the Iter8 SDK by the frontend service.
 
-The frontend service provides two endpoints _/getRecommendation_ and _/buy_. The _/getRecommendation_ endpoint relies on a backend service endpoint _/recommend_: 
+The frontend service provides two endpoints _/getRecommendation_ and _/buy_. The _/getRecommendation_ endpoint relies on a backend service endpoint _/recommend_:
 
 ![application interaction](images/two-tier.png)
 
@@ -29,7 +29,15 @@ Sample implementations of the frontend service in go, python and node demonstrat
 
 ## Prerequisite
 
-A Kubernetes cluster with ABn service deployed.  See ...
+A Kubernetes cluster with ABn service deployed:
+
+```shell
+helm install abn ../../iter8-tools/hub/charts/abn-service-single/ \
+--set image=$ABN_SERVICE_TAG \
+--set resources='{deployments,services}' \
+--set service.name=abn \
+--set application=backend
+```
 
 ## Backend Service
 
@@ -103,11 +111,43 @@ Note that the returned recommendation is, in fact, the version of the backed ser
 Then:
 
 ```shell
-curl localhhost:8090/buy -H 'X-User: foo'
+curl localhost:8090/buy -H 'X-User: foo'
 ```
 
 Currently, the metric is written to the ABn service log:
 
 ```shell
 kubectl logs -f deploy/abn
+```
+
+```shell
+data:
+  versionname.metricname: <base64 encoded object - count, sum, min, max, ss, lut>
+  ...
+
+// great for writing
+
+data:
+  versionname:
+    metricname:
+      encodedmetric: <base64 encoded object - count, sum, min, max, ss>
+      lastupdatetime:
+    metricname:
+    ...
+    lastupdatetime: <max of all lut>
+  versionname:
+  ...
+
+// best for reading, reomving old version data
+
+
+data:
+  metricname:
+    versionname: <base64 encoded object - count, sum, min, max, ss, lut>
+    versionname:
+    ...
+  metricname:
+  ...
+
+// good for writing
 ```
