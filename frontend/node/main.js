@@ -39,20 +39,20 @@ app.get('/getRecommendation', (req, res) => {
     client.lookup(application, function(err, session) {
         // lookup route using track
         route = trackToRoute[session.getTrack()];
-    });
- 
-    // call backend service using route
-    http.get(route + '/recommend', (resp) => {
-        let str = '';
-        resp.on('data', function(chunk) {
-            str += chunk;
+
+        // call backend service using route
+        http.get(route + '/recommend', (resp) => {
+            let str = '';
+            resp.on('data', function(chunk) {
+                str += chunk;
+            });
+            resp.on('end', function () {
+                // write response to query
+                res.send(`Recommendation: ${str}`);
+            });
+        }).on("error", (err) => {
+            res.status(500).send(err.message);
         });
-        resp.on('end', function () {
-            // write response to query
-            res.send(`Recommendation: ${str}`);
-        });
-    }).on("error", (err) => {
-        res.status(500).send(err.message);
     });
 });
 

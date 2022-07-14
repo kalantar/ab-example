@@ -8,5 +8,4 @@ RUN npm install
 
 COPY frontend/node .
 
-EXPOSE 8091
 CMD ["node", "main.js"]
