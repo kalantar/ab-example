@@ -17,7 +17,11 @@ const trackToRoute = {
     "candidate": "http://backend-candidate:8091",
 }
 // establish connection to ABn service
-var client = new services.ABNClient('abn:50051', grpc.credentials.createInsecure());
+var abnService = process.env.ABN_SERVICE || 'iter8-abn'
+var abnServicePort = process.env.ABN_SERVICE_PORT || 50051
+var abnEndpoint = abnService + ':' + abnServicePort.toString()
+console.log(abnEndpoint)
+var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure());
 
 // implement /getRecommendation endpoint
 // calls backend service /recommend endpoint

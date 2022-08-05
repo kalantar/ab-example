@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -21,10 +23,17 @@ func getVersion() string {
 
 // implment /recommend endpoint returning value of VERSION env variable
 func recommend(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(w, getVersion())
+	Logger.Trace("recommend called")
+	version := getVersion()
+	Logger.Info("/recommend returns ", version)
+	fmt.Fprintln(w, version)
 }
 
+var Logger *logrus.Logger
+
 func main() {
+	Logger = logrus.New()
+
 	// configure backend service with "/recommend" endpoint
 	http.HandleFunc("/recommend", recommend)
 	http.ListenAndServe(":8091", nil)
