@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/name: backend
     app.kubernetes.io/version: v1
   annotations:
+    iter8.tools/abn: "true"
     iter8.tools/ready: "true"
     iter8.tools/track: default
 spec:
@@ -47,6 +48,7 @@ metadata:
     app.kubernetes.io/name: backend
     app.kubernetes.io/version: v2
   annotations:
+    iter8.tools/abn: "true"
     iter8.tools/ready: "true"
     iter8.tools/track: candidate
 spec:
