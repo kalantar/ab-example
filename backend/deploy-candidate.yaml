@@ -6,7 +6,6 @@ metadata:
     app.kubernetes.io/name: backend
     app.kubernetes.io/version: v2
     iter8.tools/abn: "true"
-    iter8.tools/track: candidate
 spec:
   replicas: 1
   selector:
@@ -17,7 +16,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: backend
-        iter8.tools/track: candidate
     spec:
       containers:
       - name: backend
