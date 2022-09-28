@@ -126,7 +126,7 @@ func main() {
 
 	// establish connection to ABn service
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	conn, err := grpc.Dial("abn:50051", opts...)
+	conn, err := grpc.Dial("iter8-abn:50051", opts...)
 	if err != nil {
 		panic("Cannot establish connection with abn service")
 		// return
