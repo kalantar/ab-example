@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	VERSION         = "VERSION"
+	MY_VERSION         = "MY_VERSION"
 	DEFAULT_VERSION = "v1"
 )
 
 func getVersion() string {
-	version, ok := os.LookupEnv(VERSION)
+	version, ok := os.LookupEnv(MY_VERSION)
 	if !ok {
 		version = DEFAULT_VERSION
 	}
