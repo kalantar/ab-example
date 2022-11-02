@@ -1,4 +1,4 @@
-name: Publish binaries, Brew formula, and Docker image
+name: test iter8 gh-action
 
 on:
   workflow_dispatch:
@@ -6,7 +6,6 @@ on:
 jobs:
   gh-action:
     runs-on: ubuntu-latest
-    needs: assets
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -39,9 +38,6 @@ jobs:
   kubernetes-http-experiment:
     name: Kubernetes http load test    
     runs-on: ubuntu-latest
-    needs: 
-    - build-and-push
-    - assets
     steps:
     - uses: iter8-tools/iter8@v0.12-pre
     - name: Start kind cluster
@@ -65,98 +61,4 @@ jobs:
         iter8 k report
         iter8 k log
         iter8 k delete
-
-  kubernetes-grpc-experiment:
-    name: Kubernetes gRPC load test
-    runs-on: ubuntu-latest
-    needs: 
-    - build-and-push
-    - assets
-    steps:
-    - uses: iter8-tools/iter8@v0.12-pre
-    - name: Start kind cluster
-      uses: helm/kind-action@v1.2.0
-      with:
-        wait: 300s
-    - name: create app
-      run: |
-        kubectl create deploy hello --image=docker.io/grpc/java-example-hostname:latest --port=50051
-        kubectl expose deploy hello --port=50051
-        kubectl wait --for=condition=available --timeout=60s deploy/hello
-    - name: iter8 k launch
-      run: |
-        iter8 k launch \
-        --set tasks={grpc} \
-        --set grpc.host="hello.default:50051" \
-        --set grpc.call="helloworld.Greeter.SayHello" \
-        --set grpc.protoURL="https://raw.githubusercontent.com/grpc/grpc-go/master/examples/helloworld/helloworld/helloworld.proto" \
-        --set runner=job
-    - name: try other iter8 k commands
-      run: |
-        iter8 k assert -c completed -c nofailure --timeout 60s
-        iter8 k report
-        iter8 k log
-        iter8 k delete
-
-  readiness:
-    name: Kubernetes readiness test
-    runs-on: ubuntu-latest
-    needs: 
-    - build-and-push
-    - assets
-    steps:
-    - uses: iter8-tools/iter8@v0.12-pre
-    - name: Start kind cluster
-      uses: helm/kind-action@v1.2.0
-      with:
-        wait: 300s
-    - name: deploy resources to cluster
-      run: |
-        kubectl create deploy httpbin --image=kennethreitz/httpbin --port=80
-        kubectl expose deploy httpbin --port=80
-    - name: k launch with readiness checks
-      run: |
-        iter8 k launch \
-        --set "tasks={ready,http,assess}" \
-        --set ready.deploy="httpbin" \
-        --set ready.service="httpbin" \
-        --set ready.timeout=60s \
-        --set http.url=http://httpbin.default \
-        --set assess.SLOs.upper.http/latency-mean=50 \
-        --set runner=job
-    - name: k assert experiment completed without failures
-      run: |
-        iter8 k assert -c completed -c nofailure --timeout 60s
-
-  readiness-with-namespace:
-    name: Kubernetes readiness test with namespace
-    runs-on: ubuntu-latest
-    needs: 
-    - build-and-push
-    - assets
-    steps:
-    - uses: iter8-tools/iter8@v0.12-pre
-    - name: Start kind cluster
-      uses: helm/kind-action@v1.2.0
-      with:
-        wait: 300s
-    - name: deploy resources to cluster
-      run: |
-        kubectl create deploy httpbin --image=kennethreitz/httpbin --port=80
-        kubectl expose deploy httpbin --port=80
-        kubectl create namespace experiments
-    - name: k launch with readiness checks
-      run: |
-        iter8 k launch -n experiments \
-        --set "tasks={ready,http,assess}" \
-        --set ready.deploy="httpbin" \
-        --set ready.service="httpbin" \
-        --set ready.timeout=60s \
-        --set ready.namespace=default \
-        --set http.url=http://httpbin.default/get \
-        --set assess.SLOs.upper.http/latency-mean=50 \
-        --set runner=job
-    - name: k assert experiment completed without failures
-      run: |
-        iter8 k assert -n experiments -c completed -c nofailure --timeout 60s
 
