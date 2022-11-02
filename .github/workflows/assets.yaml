@@ -33,7 +33,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_SECRET }}
     - uses: docker/build-push-action@v2
       with:
-        tags: ${{ env.OWNER }}/abn-backend:${{ env.VERSION }},${{ env.OWNER }}/iter8:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/iter8:latest
+        tags: ${{ env.OWNER }}/abn-backend:${{ env.VERSION }},${{ env.OWNER }}/abn-backend:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-backend:latest
         file: backend/Dockerfile
         push: true
         build-args:
