@@ -33,7 +33,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_SECRET }}
-    - uses: docker/build-push-action@v2
+    - uses: docker/build-push-action@v3
       with:
         tags: ${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:latest
         file: samples/abn-sample/backend/Dockerfile
@@ -67,7 +67,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_SECRET }}
-    - uses: docker/build-push-action@v2
+    - uses: docker/build-push-action@v3
       with:
         tags: ${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:${{ env.VERSION }},${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:latest
         file: samples/abn-sample/frontend/${{ matrix.lang }}/Dockerfile
