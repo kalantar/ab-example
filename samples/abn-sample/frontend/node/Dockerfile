@@ -2,7 +2,7 @@
 FROM node:18
 # RUN mkdir -p /usr/app
 WORKDIR /usr/app
-COPY frontend/node/package*.json .
+COPY samples/abn-sample/frontend/node/package*.json .
 
 RUN npm install
 
