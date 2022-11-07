@@ -11,7 +11,7 @@ jobs:
   build-and-push-backend:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Get version
@@ -45,7 +45,7 @@ jobs:
       matrix:
         lang: [go, node, python]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Get version
