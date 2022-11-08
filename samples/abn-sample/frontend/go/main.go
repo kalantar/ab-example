@@ -112,8 +112,6 @@ func main() {
 	})
 	Logger.SetLevel(logrus.TraceLevel)
 
-	Logger.Error(fmt.Sprintf("%s:%s", getAbnService(), getAbnServicePort()))
-
 	// establish connection to ABn service
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", getAbnService(), getAbnServicePort()), opts...)

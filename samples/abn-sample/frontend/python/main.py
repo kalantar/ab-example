@@ -34,7 +34,6 @@ def getRecommendation():
 
     # establish connection to ABn service
     abnSvc = os.getenv('ABN_SERVICE', 'iter8-abn') + ":" + os.getenv('ABN_SERVICE_PORT', '50051')
-    print (abnSvc)
     with grpc.insecure_channel(abnSvc) as channel:
         stub = abn_pb2_grpc.ABNStub(channel)
 
@@ -73,7 +72,6 @@ def buy():
 
     # establish connection to ABn service
     abnSvc = os.getenv('ABN_SERVICE', 'iter8-abn') + ":" + os.getenv('ABN_SERVICE_PORT', '50051')
-    print (abnSvc)
     with grpc.insecure_channel(abnSvc) as channel:
         stub = abn_pb2_grpc.ABNStub(channel)
 
