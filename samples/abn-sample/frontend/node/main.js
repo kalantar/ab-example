@@ -16,36 +16,36 @@ const trackToRoute = {
     "default":   "http://backend:8091",
     "candidate": "http://backend-candidate:8091",
 }
+
 // establish connection to ABn service
 var abnService = process.env.ABN_SERVICE || 'iter8-abn'
 var abnServicePort = process.env.ABN_SERVICE_PORT || 50051
 var abnEndpoint = abnService + ':' + abnServicePort.toString()
-console.log(abnEndpoint)
 var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure());
 
 // implement /getRecommendation endpoint
 // calls backend service /recommend endpoint
 app.get('/getRecommendation', (req, res) => {
-	// Get user (session) identifier, for example by inspection of header X-User
-    const user = req.header('X-User')
+	// // Get user (session) identifier, for example by inspection of header X-User
+    // const user = req.header('X-User');
 
     // Get endpoint of backend endpoint "/recommend"
 	// In this example, the backend endpoint depends on the version (track) of the backend service
 	// the user is assigned by the Iter8 SDK Lookup() method
 
     // start with default route
-    route = trackToRoute['default']
+    route = trackToRoute['default'];
 
     // call ABn service API Lookup() to get an assigned track for the user
     var application = new messages.Application();
     application.setName('default/backend');
-    application.setUser(user);
+    application.setUser(req.header('X-User'));
     client.lookup(application, function(err, session) {
         // lookup route using track
         route = trackToRoute[session.getTrack()];
 
         // call backend service using route
-        http.get(route + '/recommend', (resp) => {
+        http.get(trackToRoute[session.getTrack()] + '/recommend', (resp) => {
             let str = '';
             resp.on('data', function(chunk) {
                 str += chunk;
