@@ -11,7 +11,7 @@ const { application } = require('express');
 
 const app  = express();
 
-// map of track to route to backend service
+// define map of track to route to backend service
 const trackToRoute = {
     "default":   "http://backend:8091",
     "candidate": "http://backend-candidate:8091",
@@ -23,17 +23,9 @@ var abnServicePort = process.env.ABN_SERVICE_PORT || 50051
 var abnEndpoint = abnService + ':' + abnServicePort.toString()
 var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure());
 
-// implement /getRecommendation endpoint
-// calls backend service /recommend endpoint
+// /getRecommendation endpoint; calls backend service /recommend endpoint
 app.get('/getRecommendation', (req, res) => {
-	// // Get user (session) identifier, for example by inspection of header X-User
-    // const user = req.header('X-User');
-
-    // Get endpoint of backend endpoint "/recommend"
-	// In this example, the backend endpoint depends on the version (track) of the backend service
-	// the user is assigned by the Iter8 SDK Lookup() method
-
-    // start with default route
+    // identify default route
     route = trackToRoute['default'];
 
     // call ABn service API Lookup() to get an assigned track for the user
@@ -41,11 +33,16 @@ app.get('/getRecommendation', (req, res) => {
     application.setName('default/backend');
     application.setUser(req.header('X-User'));
     client.lookup(application, function(err, session) {
-        // lookup route using track
-        route = trackToRoute[session.getTrack()];
+        if (err.code == 0) {
+            // use route determined by recommended track
+            route = trackToRoute[session.getTrack()];
+        } else {
+            // use default route (see above)
+            console.error("ERROR: " + err.details);
+        }
 
         // call backend service using route
-        http.get(trackToRoute[session.getTrack()] + '/recommend', (resp) => {
+        http.get(route + '/recommend', (resp) => {
             let str = '';
             resp.on('data', function(chunk) {
                 str += chunk;
@@ -55,12 +52,13 @@ app.get('/getRecommendation', (req, res) => {
                 res.send(`Recommendation: ${str}`);
             });
         }).on("error", (err) => {
+            console.error("ERROR: " + err.syscall + " " + err.code + " " + err.hostname);
             res.status(500).send(err.message);
         });
     });
 });
 
-// implement /buy endpoint
+// /buy endpoint
 // writes value for sample_metric which may have spanned several calls to /getRecommendation
 app.get('/buy', (req, res) => {
 	// Get user (session) identifier, for example by inspection of header X-User
