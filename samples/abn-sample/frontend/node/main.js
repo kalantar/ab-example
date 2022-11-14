@@ -33,12 +33,12 @@ app.get('/getRecommendation', (req, res) => {
     application.setName('default/backend');
     application.setUser(req.header('X-User'));
     client.lookup(application, function(err, session) {
-        if (err.code == 0) {
-            // use route determined by recommended track
-            route = trackToRoute[session.getTrack()];
-        } else {
+        if (err) {
             // use default route (see above)
             console.error("ERROR: " + err.details);
+        } else {
+            // use route determined by recommended track
+            route = trackToRoute[session.getTrack()];
         }
 
         // call backend service using route
