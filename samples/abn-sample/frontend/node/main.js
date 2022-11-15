@@ -41,6 +41,7 @@ app.get('/getRecommendation', (req, res) => {
             route = trackToRoute[session.getTrack()];
         }
 
+        console.log(route + '/recommend')
         // call backend service using route
         http.get(route + '/recommend', (resp) => {
             let str = '';
