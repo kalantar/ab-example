@@ -8,35 +8,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	MY_VERSION      = "MY_VERSION"
-	DEFAULT_VERSION = "v1"
-)
-
-// func getVersion() string {
-// 	version, ok := os.LookupEnv(MY_VERSION)
-// 	if !ok {
-// 		version = DEFAULT_VERSION
-// 	}
-// 	return version
-// }
-
 type Data struct {
-	Id   int
-	Name string
+	Id     int
+	Name   string
+	Source string
 }
 
 // implment /recommend endpoint returning value of VERSION env variable
 func recommend(w http.ResponseWriter, req *http.Request) {
 	Logger.Trace("recommend called")
-	// data := getVersion()
+
 	data := Data{
-		Id:   17,
-		Name: "sample",
+		Id:     19,
+		Name:   "sample",
+		Source: os.Getenv("HOSTNAME"),
 	}
-	Logger.Info("/recommend returns ", data)
-	Logger.Info(os.Environ())
-	// fmt.Fprintln(w, data)
 	json.NewEncoder(w).Encode(data)
 }
 
