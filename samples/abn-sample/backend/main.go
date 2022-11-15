@@ -23,6 +23,7 @@ func recommend(w http.ResponseWriter, req *http.Request) {
 		Name:   "sample",
 		Source: os.Getenv("HOSTNAME"),
 	}
+	Logger.Info("/recommend returning ", data)
 	json.NewEncoder(w).Encode(data)
 }
 
