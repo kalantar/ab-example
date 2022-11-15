@@ -10,8 +10,7 @@ COPY samples/abn-sample/frontend/python .
 RUN pip install -r requirements.txt
 
 COPY samples/abn-sample/frontend/abn.proto .
-RUN python -m grpc_tools.protoc -I. --python_out=. --pyi_out=. --grpc_python_out=. ./abn.proto
-
+RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. ./abn.proto 
 
 ENV FLASK_APP main.py
 ENTRYPOINT ["flask", "run", "--port", "8090"]
