@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"os"
 
@@ -9,24 +9,35 @@ import (
 )
 
 const (
-	MY_VERSION         = "MY_VERSION"
+	MY_VERSION      = "MY_VERSION"
 	DEFAULT_VERSION = "v1"
 )
 
-func getVersion() string {
-	version, ok := os.LookupEnv(MY_VERSION)
-	if !ok {
-		version = DEFAULT_VERSION
-	}
-	return version
+// func getVersion() string {
+// 	version, ok := os.LookupEnv(MY_VERSION)
+// 	if !ok {
+// 		version = DEFAULT_VERSION
+// 	}
+// 	return version
+// }
+
+type Data struct {
+	Id   int
+	Name string
 }
 
 // implment /recommend endpoint returning value of VERSION env variable
 func recommend(w http.ResponseWriter, req *http.Request) {
 	Logger.Trace("recommend called")
-	version := getVersion()
-	Logger.Info("/recommend returns ", version)
-	fmt.Fprintln(w, version)
+	// data := getVersion()
+	data := Data{
+		Id:   17,
+		Name: "sample",
+	}
+	Logger.Info("/recommend returns ", data)
+	Logger.Info(os.Environ())
+	// fmt.Fprintln(w, data)
+	json.NewEncoder(w).Encode(data)
 }
 
 var Logger *logrus.Logger
