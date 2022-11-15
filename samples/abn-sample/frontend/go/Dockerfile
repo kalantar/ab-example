@@ -1,20 +1,20 @@
 # Get Iter8
 FROM golang:1.19-buster as builder
 
-# Install protoc
-RUN apt update && apt install -y protobuf-compiler
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-RUN export export PATH="$PATH:$(go env GOPATH)/bin"
+# # Install protoc
+# RUN apt update && apt install -y protobuf-compiler
+# RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+# RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# RUN export export PATH="$PATH:$(go env GOPATH)/bin"
 
 # Get source
 WORKDIR /
 COPY samples/abn-sample/frontend/go .
-COPY samples/abn-sample/frontend/abn.proto .
+# COPY samples/abn-sample/frontend/abn.proto .
 
-# Generate interface to Iter8A/B(/n) service
-RUN mkdir -p grpc
-RUN protoc --go_out=./grpc --go_opt=paths=source_relative --go-grpc_out=./grpc --go-grpc_opt=paths=source_relative  ./abn.proto
+# # Generate interface to Iter8A/B(/n) service
+# RUN mkdir -p grpc
+# RUN protoc --go_out=./grpc --go_opt=paths=source_relative --go-grpc_out=./grpc --go-grpc_opt=paths=source_relative  ./abn.proto
 
 # Build frontend
 RUN go mod download
