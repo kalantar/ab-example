@@ -38,10 +38,11 @@ app.get('/getRecommendation', (req, res) => {
             console.error("ERROR: " + err.details);
         } else {
             // use route determined by recommended track
+            console.log(session.getTrack());
             route = trackToRoute[session.getTrack()];
         }
 
-        console.log(route + '/recommend')
+        console.log(route + '/recommend');
         // call backend service using route
         http.get(route + '/recommend', (resp) => {
             let str = '';
