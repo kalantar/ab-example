@@ -5,6 +5,9 @@ SERVICE="http://localhost:8090"
 GET_RECOMMENDATION="$SERVICE/getRecommendation"
 BUY="$SERVICE/buy"
 
+
+while (( 1 )); do 
+
 __num_recommendations=$(( ( RANDOM % 5 )  + 1 ))
 __user="unknown"
 
@@ -33,3 +36,6 @@ done
 # buy
 curl -s ${BUY} -H "X-User: ${__user}"
 echo
+
+sleep 2
+done
