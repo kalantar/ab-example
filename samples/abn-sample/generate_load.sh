@@ -6,8 +6,6 @@ GET_RECOMMENDATION="$SERVICE/getRecommendation"
 BUY="$SERVICE/buy"
 
 
-while (( 1 )); do 
-
 __num_recommendations=$(( ( RANDOM % 5 )  + 1 ))
 __user="unknown"
 
@@ -25,17 +23,19 @@ __user="unknown"
     esac
 done
 
-# get some recommendations
-i=0
-while (( ${i} < ${__num_recommendations} )); do
-    curl -s ${GET_RECOMMENDATION} -H "X-User: ${__user}"
-    sleep $(( ( RANDOM % 2000 ) / 1000 ))
-    (( i += 1 ))
-done
+while (( 1 )); do 
 
-# buy
-curl -s ${BUY} -H "X-User: ${__user}"
-echo
+    # get some recommendations
+    i=0
+    while (( ${i} < ${__num_recommendations} )); do
+        curl -s ${GET_RECOMMENDATION} -H "X-User: ${__user}"
+        sleep $(( ( RANDOM % 2000 ) / 1000 ))
+        (( i += 1 ))
+    done
 
-sleep 2
-done
+    # buy
+    curl -s ${BUY} -H "X-User: ${__user}"
+    echo
+
+    sleep 2
+    done
