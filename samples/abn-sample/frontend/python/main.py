@@ -30,7 +30,7 @@ def getRecommendation():
     # the user is assigned by the Iter8 SDK Lookup() method
 
     # start with default route
-    route = trackToRoute["default"]
+    route = trackToRoute["backend"]
 
     # establish connection to ABn service
     abnSvc = os.getenv('ABN_SERVICE', 'iter8-abn') + ":" + os.getenv('ABN_SERVICE_PORT', '50051')

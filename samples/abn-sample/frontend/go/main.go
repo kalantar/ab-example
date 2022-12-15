@@ -45,7 +45,7 @@ func getRecommendation(w http.ResponseWriter, req *http.Request) {
 	// the user is assigned by the Iter8 SDK Lookup() method
 
 	// start with default route
-	route := trackToRoute["default"]
+	route := trackToRoute["backend"]
 
 	// call ABn service API Lookup() to get an assigned track for the user
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

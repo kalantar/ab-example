@@ -26,7 +26,7 @@ var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure
 // /getRecommendation endpoint; calls backend service /recommend endpoint
 app.get('/getRecommendation', (req, res) => {
     // identify default route
-    route = trackToRoute['default'];
+    route = trackToRoute['backend'];
 
     // call ABn service API Lookup() to get an assigned track for the user
     var application = new messages.Application();
