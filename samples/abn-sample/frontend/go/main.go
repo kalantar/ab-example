@@ -22,8 +22,8 @@ import (
 var (
 	// map of track to route to backend service
 	trackToRoute = map[string]string{
-		"default":   "http://backend:8091",
-		"candidate": "http://backend-candidate:8091",
+		"backend":             "http://backend:8091",
+		"backend-candidate-1": "http://backend-candidate-1:8091",
 	}
 
 	// gRPC client connection
