@@ -11,7 +11,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	// pb "github.com/kalantar/ab-example/frontend/go/grpc"
 	pb "github.com/iter8-tools/iter8/abn/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -57,13 +56,18 @@ func getRecommendation(w http.ResponseWriter, req *http.Request) {
 			User: user,
 		},
 	)
+	if err != nil {
+		Logger.Info("error: " + err.Error())
+	}
 	// if successful, use recommended track; otherwise will use default route
 	if err == nil && s != nil {
+		Logger.Info("successful call to lookup " + s.GetTrack())
 		r, ok := trackToRoute[s.GetTrack()]
 		if ok {
 			route = r
 		}
 	}
+	Logger.Info("lookup suggested track " + route)
 
 	// call backend service using url
 	resp, err := http.Get(route + "/recommend")
