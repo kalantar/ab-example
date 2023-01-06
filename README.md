@@ -2,7 +2,7 @@
 
 ## Use Case
 
-![tests](https://github.com/kalantar/ab-example/actions/workflows/abn-sample.yaml/badge.svg)
+![tests](https://github.com/kalantar/ab-example/actions/workflows/abn-sample.yaml/badge.svg?branch=badge)
 
 Suppose we have a two tier application. The business logic (frontend) provides a customer facing application that recommends products to a user. The user can then buy a recommeded product if desired. The frontend relies on a backend recommendation service. Given a set of options for the backend recommendation service, we would like to evaluate them to determine which gives us the greatest business benefit; for example, the greatest number of sales.
 
