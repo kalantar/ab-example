@@ -48,7 +48,10 @@ def getRecommendation():
             route = trackToRoute[s.track]
         except Exception as e:
             # use default
+            app.logger.error("error: %s", e)
             pass
+
+    app.logger.info('lookup suggested track %s', route)
 
     # call backend service using url
     try:
