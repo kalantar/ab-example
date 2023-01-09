@@ -8,6 +8,7 @@ var random = require('random-number');
 const express = require('express');
 const { registerChannelzSubchannel } = require('@grpc/grpc-js/build/src/channelz.js');
 const { application } = require('express');
+const { getLogger } = require('@grpc/grpc-js/build/src/logging.js');
 
 const app  = express();
 
@@ -25,6 +26,8 @@ var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure
 
 // /getRecommendation endpoint; calls backend service /recommend endpoint
 app.get('/getRecommendation', (req, res) => {
+    console.info('/getRecommendation')
+    
     // identify default route
     route = trackToRoute['backend'];
 
@@ -40,6 +43,8 @@ app.get('/getRecommendation', (req, res) => {
             // use route determined by recommended track
             route = trackToRoute[session.getTrack()];
         }
+
+        console.info('lookup suggested tract %s', track)
 
         // call backend service using route
         http.get(route + '/recommend', (resp) => {
