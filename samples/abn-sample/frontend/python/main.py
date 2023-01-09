@@ -91,3 +91,6 @@ def buy():
             pass
 
     return "Purchase complete"
+
+if __name__ == '__main__':
+    app.run(debug=True)
