@@ -2,8 +2,6 @@
 
 ## Use Case
 
-![Unit Test Status](https://github.com/kalantar/iter8/actions/workflows/tests.yaml/badge.svg?branch=badge)
-
 Suppose we have a two tier application. The business logic (frontend) provides a customer facing application that recommends products to a user. The user can then buy a recommeded product if desired. The frontend relies on a backend recommendation service. Given a set of options for the backend recommendation service, we would like to evaluate them to determine which gives us the greatest business benefit; for example, the greatest number of sales.
 
 Note that the benefit of a backend cannot be determined in isolation from the frontend. The benefit comes from the results of (perhaps multiple) recommendations and can be determined only by the frontend servcice.
