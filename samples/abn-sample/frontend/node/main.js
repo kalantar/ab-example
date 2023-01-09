@@ -13,8 +13,8 @@ const app  = express();
 
 // define map of track to route to backend service
 const trackToRoute = {
-    "backend":   "http://backend:8091",
-    "backend-candidate-1": "http://backend-candidate-1:8091",
+    "backend":   "http://backend.default.svc.cluster.local:8091",
+    "backend-candidate-1": "http://backend-candidate-1.default.svc.cluster.local:8091",
 }
 
 // establish connection to ABn service

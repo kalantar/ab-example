@@ -12,8 +12,8 @@ from flask import Flask, request
 
 # map of track to route to backend service
 trackToRoute = {
-    "backend": "http://backend:8091",
-	"backend-candidate-1": "http://backend-candidate-1:8091"
+    "backend": "http://backend.default.svc.cluster.local:8091",
+	"backend-candidate-1": "http://http://backend-candidate-1.default.svc.cluster.local:8091"
 }
 
 app = Flask(__name__)
