@@ -36,16 +36,13 @@ app.get('/getRecommendation', (req, res) => {
     application.setName('default/backend');
     application.setUser(req.header('X-User'));
     client.lookup(application, function(err, session) {
-        if (err) {
+        if (err || (session.getTrack() == '')) {
             // use default route (see above)
-            console.error("ERROR: " + err.message)
-        } else if (session.getTrack() != '') {
+            console.warn("error or null")
+        } else {
             // use route determined by recommended track
             console.info('lookup suggested track %s', session.getTrack())
             route = trackToRoute[session.getTrack()];
-        } else {
-            // use default route (see above)
-            console.warn("WARNING: undefined response")
         }
 
         console.info('lookup suggested route %s', route)
