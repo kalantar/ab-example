@@ -26,7 +26,7 @@ var client = new services.ABNClient(abnEndpoint, grpc.credentials.createInsecure
 
 // /getRecommendation endpoint; calls backend service /recommend endpoint
 app.get('/getRecommendation', (req, res) => {
-    console.info('/getRecommendation a')
+    console.info('/getRecommendation b')
 
     // identify default route
     route = trackToRoute['backend'];
@@ -39,7 +39,7 @@ app.get('/getRecommendation', (req, res) => {
         if (err) {
             // use default route (see above)
             console.error("ERROR: " + err.message)
-        } else if (typeof session.getTrack() !== 'undefined' && session.getTrack() !== null) {
+        } else if (session.getTrack() != '') {
             // use route determined by recommended track
             console.info('lookup suggested track %s', session.getTrack())
             route = trackToRoute[session.getTrack()];
