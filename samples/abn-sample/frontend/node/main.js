@@ -36,7 +36,7 @@ app.get('/getRecommendation', (req, res) => {
     application.setName('default/backend');
     application.setUser(req.header('X-User'));
     client.lookup(application, function(err, session) {
-        if (err || (session.getTrack() == undefined)) {
+        if (err || session.getTrack() == null) {
             // use default route (see above)
             console.debug("lookup returned error or undefined")
         } else {
