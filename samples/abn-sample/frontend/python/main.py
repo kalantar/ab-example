@@ -1,4 +1,5 @@
 import random
+import logging
 
 from http import HTTPStatus
 import os
@@ -17,6 +18,7 @@ trackToRoute = {
 }
 
 app = Flask(__name__)
+app.logger.setLevel(logging.DEBUG)
 
 # implement /getRecommendation endpoint
 # calls backend service /recommend endpoint
