@@ -33,12 +33,14 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_SECRET }}
-    - uses: docker/build-push-action@v3
-      with:
-        platforms: linux/amd64,linux/arm64
-        tags: ${{ env.OWNER }}/abn-sample-backend:v1-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v1-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v1,${{ env.OWNER }}/abn-sample-backend:v2-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v2-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v2
-        file: samples/abn-sample/backend/Dockerfile
-        push: true
+    - run: |
+        docker buildx inspect
+    # - uses: docker/build-push-action@v3
+    #   with:
+    #     platforms: linux/amd64,linux/arm64
+    #     tags: ${{ env.OWNER }}/abn-sample-backend:v1-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v1-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v1,${{ env.OWNER }}/abn-sample-backend:v2-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v2-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v2
+    #     file: samples/abn-sample/backend/Dockerfile
+    #     push: true
 
   build-and-push-frontends:
     runs-on: ubuntu-latest
