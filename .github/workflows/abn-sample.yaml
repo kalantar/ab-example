@@ -35,7 +35,8 @@ jobs:
         password: ${{ secrets.DOCKERHUB_SECRET }}
     - uses: docker/build-push-action@v3
       with:
-        tags: ${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:latest
+        platforms: linux/amd64,linux/arm64,linux/arm/v7
+        tags: ${{ env.OWNER }}/abn-sample-backend:v1-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v1-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v1,${{ env.OWNER }}/abn-sample-backend:v2-${{ env.VERSION }},${{ env.OWNER }}/abn-sample-backend:v2-${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-backend:v2
         file: samples/abn-sample/backend/Dockerfile
         push: true
 
