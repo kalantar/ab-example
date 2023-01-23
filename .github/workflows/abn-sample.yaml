@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: [go, node, python]
+        lang: [go, node]
     steps:
     - uses: actions/checkout@v3
       with:
