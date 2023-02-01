@@ -23,7 +23,7 @@ AutoX uses [Argo CD](https://argo-cd.readthedocs.io), a popular continuous deliv
 
 A basic install of Argo CD can be done as follows:
 
-```shell
+```bash
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
@@ -34,7 +34,7 @@ See [here](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-a
 
 Now, we will create an `httpbin` deployment and service.
 
-```shell
+```bash
 kubectl create deployment httpbin --image=kennethreitz/httpbin --port=80
 kubectl expose deployment httpbin --port=80
 ```
@@ -43,7 +43,7 @@ kubectl expose deployment httpbin --port=80
 
 Next, we will assign `httpbin` deployment the `app.kubernetes.io/version` label (version label). AutoX will launch experiments only when this label is present on your trigger object. It will relaunch experiments whenever this version label is modified.
 
-```shell
+```bash
 kubectl label deployment httpbin app.kubernetes.io/version=1.0.0
 ```
 
@@ -51,7 +51,7 @@ kubectl label deployment httpbin app.kubernetes.io/version=1.0.0
 
 Next, we will configure and install the AutoX controller.
 
-```shell
+```bash
 helm install autox autox --repo https://iter8-tools.github.io/hub/ --version 0.1.6 \
 --set 'groups.httpbin.trigger.name=httpbin' \
 --set 'groups.httpbin.trigger.namespace=default' \
@@ -84,7 +84,7 @@ After starting AutoX, the HTTP SLO validation test should quickly follow. You ca
 
 The following command allows you to check the status of the test. Note that you need to specify an experiment group via the `-g` option. The *experiment group* for experiments started by AutoX is in the form `autox-<group name>-<experiment spec name>` so in this case, it would be `autox-httpbin-iter8`.
 
-```shell
+```bash
 iter8 k assert -c completed -c nofailure -c slos -g autox-httpbin-iter8
 ```
 
@@ -100,7 +100,7 @@ iter8 k assert -c completed -c nofailure -c slos -g autox-httpbin-iter8
 
 And the following command allows you to check the results of the experiment.
 
-```shell
+```bash
 iter8 k report -g autox-httpbin-iter8
 ```
 
@@ -147,7 +147,7 @@ iter8 k report -g autox-httpbin-iter8
 
 You can also produce an HTML report that you can view in the browser.
 
-```shell
+```bash
 iter8 k report -g autox-httpbin-iter8 -o html > report.html
 ```
 
@@ -160,7 +160,7 @@ Now that AutoX is watching the `httpbin` deployment, release a new version will 
 
 For simplicity, we will simply change the version label to the deployment in order to relaunch the HTTP SLO validation test. In the real world, a new version would typically involve a change to the deployment spec (e.g., the container image) and this change should be accompanied by a change to the version label.
 
-```shell
+```bash
 kubectl label deployment httpbin app.kubernetes.io/version=2.0.0 --overwrite
 ```
 
@@ -186,7 +186,7 @@ Lastly, recall that you can provide multiple groups and experiment specs so Auto
 
 ## Clean up
 
-```shell
+```bash
 # delete AutoX controller and any experiments started by AutoX
 helm delete autox
 

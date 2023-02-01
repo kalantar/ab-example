@@ -19,7 +19,7 @@ b. **WriteMetric()** - associates a metric with a backend component
 This SDK, implemented using gRPC, can be used from a number of frontend implementation languages including *Node.js*, *Python*, *Ruby*, and *Go*, among others. Details of the Iter8 SDK are documented in the [gRPC protoc file](https://github.com/iter8-tools/iter8/blob/v0.13.0/abn/grpc/abn.proto).
 
 This tutorial describes an A/B testing experiment for a backend component.
-Example frontends are provided in *Node.js* and *Go*.
+Example implementations of frontend components are provided in *Node.js* and *Go*.
 
 <p align='center'>
 <img alt-text="A/B/n experiment" src="../images/abn.png" />
@@ -151,7 +151,7 @@ iter8 k report
     ```
 The output allows you to compare the versions against each other and select a winner. Since the experiment runs periodically, you should expect the values in the report to change over time.
 
-Once a winner is identified, the experiment can be terminated and the winner can be promoted and the canidiate versions can be deleted.
+Once a winner is identified, the experiment can be terminated and the winner can be promoted and the candidiate versions can be deleted.
 
 To delete the experiment:
 
