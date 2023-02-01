@@ -33,8 +33,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_SECRET }}
-    - run: |
-        docker buildx ls
     - uses: docker/build-push-action@v3
       with:
         platforms: linux/amd64,linux/arm64
