@@ -1,0 +1,11 @@
+matrix:
+- name: Markdown
+  aspell:
+    lang: en
+  # dictionary:
+  #   wordlists:
+  #   - .github/wordlist.txt # <-- put path to custom dictionary file here
+  #   encoding: utf-8
+  sources:
+  - 'README.md'
+  default_encoding: utf-8
