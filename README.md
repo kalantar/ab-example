@@ -2,16 +2,16 @@
 
 ## Use Case
 
-Suppose we have a two tier application. The business logic (frontend) provides a customer facing application that recommends products to a user. The user can then buy a recommeded product if desired. The frontend relies on a backend recommendation service. Given a set of options for the backend recommendation service, we would like to evaluate them to determine which gives us the greatest business benefit; for example, the greatest number of sales.
+Suppose we have a two tier application. The business logic (frontend) provides a customer facing application that recommends products to a user. The user can then buy a recommended product if desired. The frontend relies on a backend recommendation service. Given a set of options for the backend recommendation service, we would like to evaluate them to determine which gives us the greatest business benefit; for example, the greatest number of sales.
 
-Note that the benefit of a backend cannot be determined in isolation from the frontend. The benefit comes from the results of (perhaps multiple) recommendations and can be determined only by the frontend servcice.
+Note that the benefit of a backend cannot be determined in isolation from the frontend. The benefit comes from the results of (perhaps multiple) recommendations and can be determined only by the frontend service.
 
 To address the challenge of associating a business metric computed by a frontend service with a backend service is addressed by the introduction of the Iter8 SDK and ABn service. The SDK, to be used to implement frontend services, provides two APIs:
 
 - lookup() - identifies a version of the backend service that should be used for a request
 - writeMetric() - exports a business metric and associated it with the associated backend service
 
-## Applciation
+## Application
 
 This project contains a sample two-tier application that demonstrates the use of the Iter8 SDK by the frontend service.
 
@@ -21,7 +21,7 @@ The frontend service provides two endpoints _/getRecommendation_ and _/buy_. The
 
 To compare multiple versions of the backend service, use the Iter8 SDK to identify which version or _track_ of the backend to send a request to and to export metrics to a metrics data:
 
-![application interation with Iter8 ABn service](images/two-tier-with-iter8abn.png)
+![application interaction with Iter8 ABn service](images/two-tier-with-iter8abn.png)
 
 An Iter8 experiment can then be written to evaluate the versions.
 
@@ -48,7 +48,7 @@ docker build . -f backend/Dockerfile -t $BACKEND_TAG
 docker push $BACKEND_TAG
 ```
 
-Deploy two versions of the backend service. One, _v1_ is identified as the _default_ version. The other, _v2_ is the _candidate_ version. While the specific versions will change over time, we alwasys evaluate a candidate version against a default version.
+Deploy two versions of the backend service. One, _v1_ is identified as the _default_ version. The other, _v2_ is the _candidate_ version. While the specific versions will change over time, we always evaluate a candidate version against a default version.
 
 ```shell
 sed -e "s#BACKEND_TAG#$BACKEND_TAG#" backend/deploy.yaml | kubectl apply -f -
@@ -138,7 +138,7 @@ data:
   versionname:
   ...
 
-// best for reading, reomving old version data
+// best for reading, removing old version data
 
 
 data:
