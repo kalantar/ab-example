@@ -30,6 +30,7 @@ Knative
 kubectl
 Kubernetes
 Kubecon
+KServe
 Linkerd
 LitmusChaos
 localhost
