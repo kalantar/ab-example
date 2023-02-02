@@ -7,7 +7,9 @@ AutoX
 backend
 benchmarking
 Cha
+chaosengine
 CLI
+cronjob
 crontab
 declaratively
 DevOps
@@ -51,6 +53,7 @@ Parthasarathy
 plotly
 png
 PRs
+protobuf
 protoc
 roadmap
 SDK
@@ -101,3 +104,19 @@ trackToRoute
 toJson
 versionname
 WriteMetric
+contentType
+numRequests
+payloadStr
+qps
+bool
+payloadTemplateURL
+softFailure
+tpl
+struct
+versionValues
+ProviderSpec
+jqExpression
+binaryDataURL
+binaryDataURL
+metadataURL
+protoURL

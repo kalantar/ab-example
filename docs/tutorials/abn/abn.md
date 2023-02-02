@@ -117,7 +117,7 @@ iter8 k launch \
 ```
 
 ??? note "About this experiment"
-    This experiment periodically (in this case, once a minute) reads the `abn` metrics associated with the *backend* application component in the *default* namespace. These metrics are written by the frontend service using the *WriteMetrics()* interface as a part of processing user requests.
+    This experiment periodically (in this case, once a minute) reads the `abn` metrics associated with the *backend* application component in the *default* namespace. These metrics are written by the frontend service using the *WriteMetric()* interface as a part of processing user requests.
 
 ## Inspect experiment report
 
@@ -151,7 +151,7 @@ iter8 k report
     ```
 The output allows you to compare the versions against each other and select a winner. Since the experiment runs periodically, you should expect the values in the report to change over time.
 
-Once a winner is identified, the experiment can be terminated and the winner can be promoted and the candidiate versions can be deleted.
+Once a winner is identified, the experiment can be terminated and the winner can be promoted and the candidate versions can be deleted.
 
 To delete the experiment:
 
