@@ -107,6 +107,7 @@ WriteMetric
 contentType
 numRequests
 payloadStr
+payloadURL
 qps
 bool
 payloadTemplateURL
@@ -118,5 +119,6 @@ ProviderSpec
 jqExpression
 binaryDataURL
 binaryDataURL
+dataURL
 metadataURL
 protoURL
