@@ -1,0 +1,67 @@
+name: Custom Metrics with mockoon
+
+on:
+  workflow_dispatch:
+
+jobs:
+  spell-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - run: |
+        pwd
+        ls -l
+
+    # set up kind cluster
+    - name: Start kind cluster
+      uses: helm/kind-action@v1.5.0
+      with:
+        wait: 300s
+
+    # install iter8
+    - run: |
+        wget https://github.com/iter8-tools/iter8/releases/latest/download/iter8-linux-amd64.tar.gz
+        tar -xvf iter8-linux-amd64.tar.gz
+        export PATH=$PATH:linux-amd64
+
+    # install sample application
+    - name: run httpbin
+      run: |
+        set -e
+        kubectl create deploy httpbin --image=kennethreitz/httpbin --port=80
+        kubectl expose deploy httpbin --port=80
+ 
+    # run test case
+    # mock Prometheus
+    - run: | 
+        kubectl create deploy prometheus-mock \
+        --image=mockoon/cli:latest \
+        --port 9090 \
+        -- mockoon-cli start --daemon-off \
+        --port=9090 \
+        --log-transaction \
+        -d https://raw.githubusercontent.com/kalantar/ab-example/main/samples/istio/prometheus-istio.json
+        kubectl expose deploy prometheus-mock --port 9090
+
+    # launch experiment
+    - run: |
+        iter8 k launch --set logLevel=trace \
+        --set "tasks={custommetrics,assess}" \
+        --set custommetrics.templates.istio-prom="https://raw.githubusercontent.com/iter8-tools/hub/main/templates/custommetrics/istio-prom.tpl" \
+        --set custommetrics.values.istioPromURL="http://prometheus-mock:9090/api/v1/query" \
+        --set custommetrics.values.labels.namespace=default \
+        --set custommetrics.values.labels.destination_app=httpbin \
+        --set "custommetrics.values.latencyPercentiles={50,75,90,95}" \
+        --set assess.SLOs.upper.istio-prom/error-rate=0.1 \
+        --set assess.SLOs.upper.istio-prom/latency-mean=100 \
+        --set assess.SLOs.upper.istio-prom/latency-p90=150 \
+        --set runner=cronjob \
+        --set cronjobSchedule="*/1 * * * *"
+    
+    # sleep
+    - run: sleep 180
+
+    # test completed successfully
+    - run: iter8 k assert -c completed,nofailure,slos
