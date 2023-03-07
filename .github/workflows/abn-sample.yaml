@@ -63,6 +63,8 @@ jobs:
           owner=iter8
         fi
         echo "OWNER=$owner" >> $GITHUB_ENV
+    - name: Setup QEMU
+      uses: docker/setup-qemu-action@v2
     - uses: docker/setup-buildx-action@v2
     - uses: docker/login-action@v2
       with:
@@ -73,5 +75,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
         tags: ${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:${{ env.VERSION }},${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:${{ env.MAJOR_MINOR_VERSION }},${{ env.OWNER }}/abn-sample-frontend-${{ matrix.lang }}:latest
         file: samples/abn-sample/frontend/${{ matrix.lang }}/Dockerfile
+        # cache-from: type-gha
+        # cache-to: type=gha,mode=max
         push: true
 
