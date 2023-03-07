@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  spell-check:
+  custom-metrics:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -32,6 +32,9 @@ jobs:
         set -e
         kubectl create deploy httpbin --image=kennethreitz/httpbin --port=80
         kubectl expose deploy httpbin --port=80
+
+    - name: Install Iter8
+      uses: iter8-tools/iter8@v0.13.9
  
     # run test case
     # mock Prometheus
