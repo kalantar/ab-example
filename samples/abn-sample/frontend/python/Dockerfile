@@ -7,6 +7,7 @@ FROM python:3.9-alpine
 # Get source
 WORKDIR /
 COPY samples/abn-sample/frontend/python .
+RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # # generate gRPC libraries from abn.proto
