@@ -8,43 +8,43 @@ on:
   #   - samples/abn-sample
 
 jobs:
-  build-and-push-backend:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Get version
-      run: |
-        tagref=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-        # Strip "v" prefix from tagref
-        echo "VERSION=$(echo $tagref | sed -e 's/^v//')" >> $GITHUB_ENV
-        echo "MAJOR_MINOR_VERSION=$(echo $tagref | sed -e 's/^v//' -e 's,\([0-9]*\.[0-9]*\)\.\([0-9]*\),\1,')" >> $GITHUB_ENV
-    - name: Get owner
-      run: |
-        ownerrepo=${{ github.repository }}
-        owner=$(echo $ownerrepo | cut -f1 -d/)
-        if [[ "$owner" == "iter8-tools" ]]; then
-          owner=iter8
-        fi
-        echo "OWNER=$owner" >> $GITHUB_ENV
-    - uses: docker/setup-buildx-action@v2
-    - uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_SECRET }}
-    - uses: docker/build-push-action@v3
-      with:
-        platforms: linux/amd64,linux/arm64
-        tags: ${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }}-v1,${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }}-v2,${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }}-v1,${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }}-v2,${{ env.OWNER }}/abn-sample-backend:latest
-        file: samples/abn-sample/backend/Dockerfile
-        push: true
+  # build-and-push-backend:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       fetch-depth: 0
+  #   - name: Get version
+  #     run: |
+  #       tagref=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+  #       # Strip "v" prefix from tagref
+  #       echo "VERSION=$(echo $tagref | sed -e 's/^v//')" >> $GITHUB_ENV
+  #       echo "MAJOR_MINOR_VERSION=$(echo $tagref | sed -e 's/^v//' -e 's,\([0-9]*\.[0-9]*\)\.\([0-9]*\),\1,')" >> $GITHUB_ENV
+  #   - name: Get owner
+  #     run: |
+  #       ownerrepo=${{ github.repository }}
+  #       owner=$(echo $ownerrepo | cut -f1 -d/)
+  #       if [[ "$owner" == "iter8-tools" ]]; then
+  #         owner=iter8
+  #       fi
+  #       echo "OWNER=$owner" >> $GITHUB_ENV
+  #   - uses: docker/setup-buildx-action@v2
+  #   - uses: docker/login-action@v2
+  #     with:
+  #       username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #       password: ${{ secrets.DOCKERHUB_SECRET }}
+  #   - uses: docker/build-push-action@v3
+  #     with:
+  #       platforms: linux/amd64,linux/arm64
+  #       tags: ${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }}-v1,${{ env.OWNER }}/abn-sample-backend:${{ env.VERSION }}-v2,${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }}-v1,${{ env.OWNER }}/abn-sample-backend:${{ env.MAJOR_MINOR_VERSION }}-v2,${{ env.OWNER }}/abn-sample-backend:latest
+  #       file: samples/abn-sample/backend/Dockerfile
+  #       push: true
 
   build-and-push-frontends:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: [go, node]
+        lang: [python]
     steps:
     - uses: actions/checkout@v3
       with:
