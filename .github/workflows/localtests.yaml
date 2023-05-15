@@ -16,12 +16,6 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v3
 
-    - name: Get modified files in the charts/iter8 folder
-      id: modified-files
-      uses: tj-actions/changed-files@v35
-      with:
-        files: charts/iter8
-
     - name: Install Iter8
       run: |
         go install github.com/iter8-tools/iter8@v0.14
