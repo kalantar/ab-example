@@ -1,0 +1,81 @@
+name: Test experiment charts using local charts
+
+on:
+  workflow_dispatch:
+
+# Kind versions used to test Iter8 on different versions of Kubernetes
+# From: https://github.com/kubernetes-sigs/kind/releases
+env:
+  versions: |
+    kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f
+
+jobs:
+  # Get the different Kind versions
+  get_versions:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get the different Kind versions
+      id: set-matrix
+      run: |
+        # Serialize versions into JSON array
+        jsonVersions=$(jq -ncR '[inputs]' <<< "$versions")
+        echo $jsonVersions
+
+        # Output serialized jsonVersions
+        echo "matrix=$jsonVersions" | sed -e "s/,\"\"//" >> $GITHUB_OUTPUT
+
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  http-experiment:
+    name: HTTP load test
+    needs: get_versions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJson(needs.get_versions.outputs.matrix) }}
+
+    steps:    
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Get modified files in the charts/iter8 folder
+      id: modified-files
+      uses: tj-actions/changed-files@v35
+      with:
+        files: charts/iter8
+
+    - name: Install Iter8
+      run: |
+        go install github.com/iter8-tools/iter8@v0.14
+        which iter8
+
+    - name: Start kind cluster ${{ matrix.version }}
+      uses: helm/kind-action@v1.5.0
+      with:
+        wait: 300s
+        node_image: ${{ matrix.version }}
+
+    - name: Create app
+      run: |
+        kubectl create deployment httpbin --image=kennethreitz/httpbin
+        kubectl expose deployment httpbin --type=ClusterIP --port=80
+        kubectl wait --for=condition=available --timeout=60s deploy/httpbin
+
+    - name: iter8 k launch
+      run: |
+        iter8 k launch \
+        --localChart \
+        --chartName charts/iter8 \
+        --set tasks={http} \
+        --set http.url="http://httpbin.default/get" \
+        --set runner=job
+
+    - name: Try other iter8 k commands
+      run: |
+        iter8 k assert -c completed -c nofailure --timeout 60s
+        iter8 k report
+        iter8 k log
+        iter8 k delete
+      
