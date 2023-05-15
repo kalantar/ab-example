@@ -5,28 +5,8 @@ on:
 
 # Kind versions used to test Iter8 on different versions of Kubernetes
 # From: https://github.com/kubernetes-sigs/kind/releases
-env:
-  versions: |
-    kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f
 
 jobs:
-  # Get the different Kind versions
-  get_versions:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Get the different Kind versions
-      id: set-matrix
-      run: |
-        # Serialize versions into JSON array
-        jsonVersions=$(jq -ncR '[inputs]' <<< "$versions")
-        echo $jsonVersions
-
-        # Output serialized jsonVersions
-        echo "matrix=$jsonVersions" | sed -e "s/,\"\"//" >> $GITHUB_OUTPUT
-
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   http-experiment:
     name: HTTP load test
@@ -55,7 +35,6 @@ jobs:
       uses: helm/kind-action@v1.5.0
       with:
         wait: 300s
-        node_image: ${{ matrix.version }}
 
     - name: Create app
       run: |
