@@ -16,6 +16,11 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v3
 
+    - name: go
+      run: |
+        go version
+        which go
+
     - name: Install Iter8
       run: |
         go install github.com/iter8-tools/iter8@v0.14
