@@ -23,7 +23,7 @@ jobs:
 
     - name: Install Iter8
       run: |
-        go install github.com/iter8-tools/iter8@v0.14
+        GOBIN=/usr/local/bin go install github.com/iter8-tools/iter8@v0.14
         which iter8
 
     - name: Start kind cluster ${{ matrix.version }}
