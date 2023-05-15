@@ -10,11 +10,7 @@ jobs:
 
   http-experiment:
     name: HTTP load test
-    needs: get_versions
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version: ${{ fromJson(needs.get_versions.outputs.matrix) }}
 
     steps:    
     - name: Check out code
