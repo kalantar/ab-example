@@ -14,21 +14,14 @@ jobs:
         with:
           wait: 300s
           node_image: kindest/node:v1.27.0@sha256:c6b22e613523b1af67d4bc8a0c38a4c3ea3a2b8fbc5b367ae36345c9cb844518
-      - run: |
-          kubectl create deployment foo  --image=ubuntu:latest  -- bash -c "ls; ls -l /; echo hello"
-          sleep 120
-      - run: |
-          kubectl logs deployment/foo
-      - run: |
-          kubectl delete deployment/foo
 
       - run: |
           kubectl create deployment routeguide --image=golang --port=50051 -- bash -c "git clone -b iter8-example --depth 1 https://github.com/Alan-Cha/grpc-go; echo done cloning; cd grpc-go/examples/route_guide; echo go into route_guide; go run server/server.go; echo run server"
-          sleep 480
-      - run: |
-          kubectl logs deployment/routeguide
-      - run: |
-          kubectl delete deployment/routeguide
+          kubectl wait --for=condition=available --timeout=60s deployment/routeguide
+          kubectl expose deployment routeguide --port=50051
 
-
-        
+      - run: |
+          curl -sO https://gist.github.com/kalantar/510737f0fd58c0432a08e5b6e45ec97f/raw/524d6660284bf653ce0f29f3a25ed0e913c3df80/grpcurl-routeguide.yaml
+          kubectl apply -f grpcurl-routeguide.yaml
+          sleep 120
+          kubectl logs deploy/sleep
