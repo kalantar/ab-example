@@ -19,3 +19,16 @@ jobs:
           sleep 120
       - run: |
           kubectl logs deployment/foo
+      - run: |
+          kubectl delete deployment/foo
+
+      - run: |
+          kubectl create deployment routeguide --image=golang --port=50051 -- bash -c "git clone -b iter8-example --depth 1 https://github.com/Alan-Cha/grpc-go; echo done cloning; cd grpc-go/examples/route_guide; echo go into route_guide; go run server/server.go; echo run server"
+          sleep 240
+      - run: |
+          kubectl logs deployment/routeguide
+      - run: |
+          kubectl delete deployment/routeguide
+
+
+        
