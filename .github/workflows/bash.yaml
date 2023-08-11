@@ -22,7 +22,7 @@ jobs:
 
       - run: |
           ls -l    
-          curl -sO https://gist.github.com/kalantar/510737f0fd58c0432a08e5b6e45ec97f/raw/524d6660284bf653ce0f29f3a25ed0e913c3df80/grpcurl-routeguide.yaml
+          curl -sO https://gist.githubusercontent.com/kalantar/510737f0fd58c0432a08e5b6e45ec97f/raw/524d6660284bf653ce0f29f3a25ed0e913c3df80/grpcurl-routeguide.yaml
           ls -l
           kubectl apply -f grpcurl-routeguide.yaml
           sleep 120
