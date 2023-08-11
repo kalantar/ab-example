@@ -1,0 +1,21 @@
+name: Test bash
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  test-bash:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Start kind cluster
+        uses: helm/kind-action@v1.5.0
+        with:
+          wait: 300s
+          node_image: kindest/node:v1.27.0@sha256:c6b22e613523b1af67d4bc8a0c38a4c3ea3a2b8fbc5b367ae36345c9cb844518
+      - run: |
+          kubectl create deployment foo  --image=ubuntu:latest  -- bash -c "ls; ls -l /; echo hello"
+          sleep 120
+      - run: |
+          kubectl logs deployment/foo
