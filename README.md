@@ -32,7 +32,7 @@ Sample implementations of the frontend service in go, python and node demonstrat
 A Kubernetes cluster with ABn service deployed:
 
 ```shell
-helm install abn ../../iter8-tools/hub/charts/abn-service-single/ \
+helm install abn ../../iter8-tools/iter8/charts/abn-service-single/ \
 --set image=$ABN_SERVICE_TAG \
 --set resources='{deployments,services}' \
 --set service.name=abn \

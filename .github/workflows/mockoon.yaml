@@ -52,7 +52,7 @@ jobs:
     - run: |
         iter8 k launch --set logLevel=trace \
         --set "tasks={custommetrics,assess}" \
-        --set custommetrics.templates.istio-prom="https://raw.githubusercontent.com/iter8-tools/hub/main/templates/custommetrics/istio-prom.tpl" \
+        --set custommetrics.templates.istio-prom="https://raw.githubusercontent.com/iter8-tools/iter8/main/templates/custommetrics/istio-prom.tpl" \
         --set custommetrics.values.istioPromURL="http://prometheus-mock:9090/api/v1/query" \
         --set custommetrics.values.labels.namespace=default \
         --set custommetrics.values.labels.destination_app=httpbin \

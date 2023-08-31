@@ -35,7 +35,7 @@ Example implementations of frontend components are provided in *Node.js* and *Go
 Deploy the Iter8 A/B/n service. When deploying the service, specify which Kubernetes resources to watch for each application. To watch for versions of the *backend* application in the *default* namespace, configure the service to watch for service and deployment resources:
 
 ```shell
-helm install --repo https://iter8-tools.github.io/hub iter8-abn abn \
+helm install --repo https://iter8-tools.github.io/iter8 iter8-abn abn \
 --set "apps.default.backend.resources={service,deployment}"
 ```
 
